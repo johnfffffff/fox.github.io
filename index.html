@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>小Z的知识体系笔记库</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind 配置 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#165DFF',
+            secondary: '#36D399',
+            accent: '#8B5CF6',
+            dark: '#1E293B',
+            light: '#F8FAFC'
+          },
+          fontFamily: {
+            inter: ['Inter', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+      }
+      .text-balance {
+        text-wrap: balance;
+      }
+      .note-card-hover {
+        @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+      }
+      .sidebar-link {
+        @apply flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200;
+      }
+      .sidebar-link.active {
+        @apply bg-primary/10 text-primary font-medium;
+      }
+    }
+  </style>
+</head>
+<body class="font-inter bg-light text-dark min-h-screen flex flex-col">
+  <!-- 顶部导航栏 -->
+  <header class="bg-white shadow-sm sticky top-0 z-50">
+    <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <button id="sidebar-toggle" class="lg:hidden text-dark p-2 rounded-lg hover:bg-gray-100">
+          <i class="fa fa-bars text-xl"></i>
+        </button>
+        <div class="flex items-center gap-2">
+          <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+            <i class="fa fa-book text-xl"></i>
+          </div>
+          <h1 class="text-xl font-bold text-dark">小Z的知识体系</h1>
+        </div>
+      </div>
+      
+      <div class="hidden md:flex items-center gap-6">
+        <div class="relative">
+          <input type="text" placeholder="搜索笔记..." class="pl-10 pr-4 py-2 rounded-lg bg-gray-100 border-0 focus:ring-2 focus:ring-primary/30 focus:bg-white w-64 transition-all">
+          <i class="fa fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+        </div>
+        
+        <div class="flex items-center gap-4">
+          <button class="text-gray-500 hover:text-primary transition-colors">
+            <i class="fa fa-bell text-xl"></i>
+          </button>
+          <button class="text-gray-500 hover:text-primary transition-colors">
+            <i class="fa fa-cog text-xl"></i>
+          </button>
+          <div class="relative">
+            <button class="flex items-center gap-2">
+              <img src="https://picsum.photos/id/64/40/40" alt="小Z的头像" class="w-10 h-10 rounded-full object-cover border-2 border-primary/20">
+              <span class="font-medium hidden lg:inline">小Z同学</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="md:hidden">
+        <button class="text-dark p-2 rounded-lg hover:bg-gray-100">
+          <i class="fa fa-search text-xl"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="flex flex-1 overflow-hidden">
+    <!-- 侧边栏 -->
+    <aside id="sidebar" class="w-64 bg-white shadow-sm hidden lg:block transition-all duration-300 ease-in-out h-[calc(100vh-3.5rem)] overflow-y-auto scrollbar-hide">
+      <nav class="p-4">
+        <div class="space-y-1 mb-6">
+          <h2 class="text-xs uppercase text-gray-500 font-semibold px-4 py-2">主导航</h2>
+          <a href="#" class="sidebar-link active">
+            <i class="fa fa-home w-5 text-center"></i>
+            <span>首页</span>
+          </a>
+          <a href="#" class="sidebar-link text-gray-600 hover:bg-gray-100">
+            <i class="fa fa-book w-5 text-center"></i>
+            <span>所有笔记</span>
+          </a>
+          <a href="#" class="sidebar-link text-gray-600 hover:bg-gray-100">
+            <i class="fa fa-star w-5 text-center"></i>
+            <span>收藏笔记</span>
+          </a>
+          <a href="#" class="sidebar-link text-gray-600 hover:bg-gray-100">
+            <i class="fa fa-clock-o w-5 text-center"></i>
+            <span>最近更新</span>
+          </a>
+        </div>
+        
+        <div class="space-y-1 mb-6">
+          <div class="flex items-center justify-between px-4 py-2">
+            <h2 class="text-xs uppercase text-gray-500 font-semibold">知识分类</h2>
+            <button class="text-primary hover:text-primary/80 text-sm">
+              <i class="fa fa-plus-circle"></i>
+            </button>
+          </div>
+          <a href="#" class="sidebar-link text-gray-600 hover:bg-gray-100">
+            <span class="w-3 h-3 rounded-full bg-blue-500 mr-2"></span>
+            <span>前端开发</span>
+            <span class="ml-auto text-xs text-gray-400">24</span>
+          </a>
+          <a href="#" class="sidebar-link text-gray-600 hover:bg-gray-100">
+            <span class="w-3 h-3 rounded-full bg-green-500 mr-2"></span>
+            <span>后端开发</span>
+            <span class="ml-auto text-xs text-gray-400">18</span>
+          </a>
+          <a href="#" class="sidebar-link text-gray-600 hover:bg-gray-100">
+            <span class="w-3 h-3 rounded-full bg-purple-500 mr-2"></span>
+            <span>数据库</span>
+            <span class="ml-auto text-xs text-gray-400">12</span>
+          </a>
+          <a href="#" class="sidebar-link text-gray-600 hover:bg-gray-100">
+            <span class="w-3 h-3 rounded-full bg-yellow-500 mr-2"></span>
+            <span>计算机基础</span>
+            <span class="ml-auto text-xs text-gray-400">31</span>
+          </a>
+          <a href="#" class="sidebar-link text-gray-600 hover:bg-gray-100">
+            <span class="w-3 h-3 rounded-full bg-red-500 mr-2"></span>
+            <span>数学知识</span>
+            <span class="ml-auto text-xs text-gray-400">9</span>
+          </a>
+        </div>
+        
+        <div class="space-y-1 mb-6">
+          <h2 class="text-xs uppercase text-gray-500 font-semibold px-4 py-2">标签云</h2>
+          <div class="px-4 py-2 flex flex-wrap gap-2">
+            <span class="text-xs bg-gray-100 px-2 py-1 rounded-full hover:bg-primary/10 hover:text-primary transition-colors">HTML</span>
+            <span class="text-xs bg-gray-100 px-2 py-1 rounded-full hover:bg-primary/10 hover:text-primary transition-colors">CSS</span>
+            <span class="text-xs bg-gray-100 px-2 py-1 rounded-full hover:bg-primary/10 hover:text-primary transition-colors">JavaScript</span>
+            <span class="text-xs bg-gray-100 px-2 py-1 rounded-full hover:bg-primary/10 hover:text-primary transition-colors">React</span>
+            <span class="text-xs bg-gray-100 px-2 py-1 rounded-full hover:bg-primary/10 hover:text-primary transition-colors">Vue</span>
+            <span class="text-xs bg-gray-100 px-2 py-1 rounded-full hover:bg-primary/10 hover:text-primary transition-colors">Node.js</span>
+            <span class="text-xs bg-gray-100 px-2 py-1 rounded-full hover:bg-primary/10 hover:text-primary transition-colors">MySQL</span>
+            <span class="text-xs bg-gray-100 px-2 py-1 rounded-full hover:bg-primary/10 hover:text-primary transition-colors">算法</span>
+          </div>
+        </div>
+        
+        <div class="space-y-1">
+          <h2 class="text-xs uppercase text-gray-500 font-semibold px-4 py-2">知识图谱</h2>
+          <div class="p-4">
+            <canvas id="knowledgeChart" width="200" height="200"></canvas>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- 主内容区 -->
+    <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-6">
+      <div class="max-w-7xl mx-auto">
+        <!-- 欢迎区域 -->
+        <div class="mb-8">
+          <h1 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-dark mb-2">欢迎回来，小Z同学</h1>
+          <p class="text-gray-600 mb-6">今天是 <span id="current-date" class="font-medium"></span>，你有 <span class="text-primary font-medium">5</span> 个待复习的笔记</p>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-white rounded-xl shadow-sm p-5 note-card-hover">
+              <div class="flex items-start justify-between">
+                <div>
+                  <p class="text-gray-500 text-sm">总笔记数</p>
+                  <h3 class="text-2xl font-bold mt-1">94</h3>
+                  <p class="text-green-500 text-xs mt-2 flex items-center">
+                    <i class="fa fa-arrow-up mr-1"></i> 12% 较上月
+                  </p>
+                </div>
+                <div class="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center text-blue-500">
+                  <i class="fa fa-file-text-o text-xl"></i>
+                </div>
+              </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm p-5 note-card-hover">
+              <div class="flex items-start justify-between">
+                <div>
+                  <p class="text-gray-500 text-sm">已完成复习</p>
+                  <h3 class="text-2xl font-bold mt-1">16</h3>
+                  <p class="text-green-500 text-xs mt-2 flex items-center">
+                    <i class="fa fa-arrow-up mr-1"></i> 8% 较上月
+                  </p>
+                </div>
+                <div class="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center text-green-500">
+                  <i class="fa fa-check-circle-o text-xl"></i>
+                </div>
+              </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm p-5 note-card-hover">
+              <div class="flex items-start justify-between">
+                <div>
+                  <p class="text-gray-500 text-sm">待复习</p>
+                  <h3 class="text-2xl font-bold mt-1">5</h3>
+                  <p class="text-red-500 text-xs mt-2 flex items-center">
+                    <i class="fa fa-arrow-up mr-1"></i> 2 新增
+                  </p>
+                </div>
+                <div class="w-12 h-12 rounded-lg bg-red-100 flex items-center justify-center text-red-500">
+                  <i class="fa fa-clock-o text-xl"></i>
+                </div>
+              </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm p-5 note-card-hover">
+              <div class="flex items-start justify-between">
+                <div>
+                  <p class="text-gray-500 text-sm">知识分类</p>
+                  <h3 class="text-2xl font-bold mt-1">5</h3>
+                  <p class="text-gray-500 text-xs mt-2">前端、后端、数据库等</p>
+                </div>
+                <div class="w-12 h-12 rounded-lg bg-purple-100 flex items-center justify-center text-purple-500">
+                  <i class="fa fa-folder-o text-xl"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 快速添加笔记 -->
+        <div class="bg-white rounded-xl shadow-sm p-5 mb-8">
+          <h2 class="text-lg font-semibold mb-4">快速添加笔记</h2>
+          <div class="space-y-4">
+            <div>
+              <input type="text" placeholder="笔记标题" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all">
+            </div>
+            <div>
+              <textarea placeholder="笔记内容..." rows="3" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all"></textarea>
+            </div>
+            <div class="flex flex-wrap gap-2 mb-4">
+              <span class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-primary/10 text-primary">
+                前端开发
+                <button class="ml-1 text-primary/70 hover:text-primary"><i class="fa fa-times-circle"></i></button>
+              </span>
+              <input type="text" placeholder="添加标签..." class="px-3 py-1 rounded-full text-sm bg-gray-100 border-0 focus:ring-1 focus:ring-primary outline-none">
+            </div>
+            <div class="flex justify-between items-center">
+              <div class="flex items-center gap-4">
+                <button class="text-gray-500 hover:text-primary transition-colors">
+                  <i class="fa fa-paperclip"></i>
+                </button>
+                <button class="text-gray-500 hover:text-primary transition-colors">
+                  <i class="fa fa-image"></i>
+                </button>
+                <button class="text-gray-500 hover:text-primary transition-colors">
+                  <i class="fa fa-code"></i>
+                </button>
+                <button class="text-gray-500 hover:text-primary transition-colors">
+                  <i class="fa fa-link"></i>
+                </button>
+              </div>
+              <button class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2">
+                <i class="fa fa-save"></i>
+                <span>保存笔记</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 最近学习的笔记 -->
+        <div class="mb-8">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg font-semibold">最近学习的笔记</h2>
+            <a href="#" class="text-primary hover:text-primary/80 text-sm flex items-center">
+              <span>查看全部</span>
+              <i class="fa fa-angle-right ml-1"></i>
+            </a>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden note-card-hover">
+              <div class="h-4 bg-blue-500"></div>
+              <div class="p-5">
+                <div class="flex justify-between items-start mb-3">
+                  <h3 class="font-semibold text-lg">React Hooks 深入理解</h3>
+                  <span class="text-xs text-gray-500">前端开发</span>
+                </div>
+                <p class="text-gray-600 text-sm mb-4 line-clamp-3">深入理解 React Hooks 的工作原理，包括 useState, useEffect, useContext 等常用 Hooks 的使用场景和最佳实践...</p>
+                <div class="flex justify-between items-center text-xs text-gray-500">
+                  <span>2025-06-18</span>
+                  <div class="flex items-center gap-3">
+                    <button class="hover:text-primary transition-colors">
+                      <i class="fa fa-star-o"></i>
+                    </button>
+                    <button class="hover:text-primary transition-colors">
+                      <i class="fa fa-pencil"></i>
+                    </button>
+                    <button class="hover:text-primary transition-colors">
+                      <i class="fa fa-trash-o"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden note-card-hover">
+              <div class="h-4 bg-green-500"></div>
+              <div class="p-5">
+                <div class="flex justify-between items-start mb-3">
+                  <h3 class="font-semibold text-lg">Node.js 性能优化</h3>
+                  <span class="text-xs text-gray-500">后端开发</span>
+                </div>
+                <p class="text-gray-600 text-sm mb-4 line-clamp-3">学习 Node.js 应用的性能优化技巧，包括异步编程、内存管理、集群模式等方面的优化策略...</p>
+                <div class="flex justify-between items-center text-xs text-gray-500">
+                  <span>2025-06-17</span>
+                  <div class="flex items-center gap-3">
+                    <button class="hover:text-primary transition-colors">
+                      <i class="fa fa-star-o"></i>
+                    </button>
+                    <button class="hover:text-primary transition-colors">
+                      <i class="fa fa-pencil"></i>
+                    </button>
+                    <button class="hover:text-primary transition-colors">
+                      <i class="fa fa-trash-o"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden note-card-hover">
+              <div class="h-4 bg-purple-500"></div>
+              <div class="p-5">
+                <div class="flex justify-between items-start mb-3">
+                  <h3 class="font-semibold text-lg">MySQL 查询优化</h3>
+                  <span class="text-xs text-gray-500">数据库</span>
+                </div>
+                <p class="text-gray-600 text-sm mb-4 line-clamp-3">掌握 MySQL 查询优化的核心原则，包括索引优化、查询计划分析、慢查询优化等技术...</p>
+                <div class="flex justify-between items-center text-xs text-gray-500">
+                  <span>2025-06-15</span>
+                  <div class="flex items-center gap-3">
+                    <button class="hover:text-primary transition-colors">
+                      <i class="fa fa-star"></i>
+                    </button>
+                    <button class="hover:text-primary transition-colors">
+                      <i class="fa fa-pencil"></i>
+                    </button>
+                    <button class="hover:text-primary transition-colors">
+                      <i class="fa fa-trash-o"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 待复习笔记 -->
+        <div class="mb-8">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg font-semibold">待复习的笔记</h2>
+            <a href="#" class="text-primary hover:text-primary/80 text-sm flex items-center">
+              <span>开始复习</span>
+              <i class="fa fa-angle-right ml-1"></i>
+            </a>
+          </div>
+          
+          <div class="space-y-3">
+            <div class="bg-white rounded-xl shadow-sm p-4 note-card-hover">
+              <div class="flex items-start gap-4">
+                <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-500 flex-shrink-0">
+                  <i class="fa fa-exclamation-circle"></i>
+                </div>
+                <div class="flex-1">
+                  <div class="flex justify-between items-start">
+                    <h3 class="font-medium">JavaScript 闭包原理</h3>
+                    <span class="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full">急需复习</span>
+                  </div>
+                  <p class="text-gray-600 text-sm mt-1 line-clamp-1">理解 JavaScript 闭包的工作原理及其在实际开发中的应用场景</p>
+                  <div class="flex justify-between items-center mt-2 text-xs text-gray-500">
+                    <span>上次复习: 2025-06-10</span>
+                    <button class="text-primary hover:text-primary/80">查看笔记</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm p-4 note-card-hover">
+              <div class="flex items-start gap-4">
+                <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-500 flex-shrink-0">
+                  <i class="fa fa-clock-o"></i>
+                </div>
+                <div class="flex-1">
+                  <div class="flex justify-between items-start">
+                    <h3 class="font-medium">HTTP 协议详解</h3>
+                    <span class="text-xs bg-yellow-100 text-yellow-600 px-2 py-0.5 rounded-full">需要复习</span>
+                  </div>
+                  <p class="text-gray-600 text-sm mt-1 line-clamp-1">掌握 HTTP 协议的工作原理，包括请求/响应格式、状态码、缓存机制等</p>
+                  <div class="flex justify-between items-center mt-2 text-xs text-gray-500">
+                    <span>上次复习: 2025-06-12</span>
+                    <button class="text-primary hover:text-primary/80">查看笔记</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm p-4 note-card-hover">
+              <div class="flex items-start gap-4">
+                <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-500 flex-shrink-0">
+                  <i class="fa fa-clock-o"></i>
+                </div>
+                <div class="flex-1">
+                  <div class="flex justify-between items-start">
+                    <h3 class="font-medium">React 生命周期</h3>
+                    <span class="text-xs bg-yellow-100 text-yellow-600 px-2 py-0.5 rounded-full">需要复习</span>
+                  </div>
+                  <p class="text-gray-600 text-sm mt-1 line-clamp-1">深入理解 React 组件的生命周期方法，包括挂载、更新和卸载阶段</p>
+                  <div class="flex justify-between items-center mt-2 text-xs text-gray-500">
+                    <span>上次复习: 2025-06-13</span>
+                    <button class="text-primary hover:text-primary/80">查看笔记</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 知识网络 -->
+        <div>
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg font-semibold">知识网络</h2>
+            <div class="flex items-center gap-2">
+              <button class="text-sm bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-lg transition-colors">
+                全部
+              </button>
+              <button class="text-sm bg-white hover:bg-gray-100 px-3 py-1 rounded-lg transition-colors">
+                前端
+              </button>
+              <button class="text-sm bg-white hover:bg-gray-100 px-3 py-1 rounded-lg transition-colors">
+                后端
+              </button>
+            </div>
+          </div>
+          
+          <div class="bg-white rounded-xl shadow-sm p-5">
+            <div class="h-64 md:h-80 relative">
+              <svg viewBox="0 0 800 400" class="w-full h-full">
+                <!-- 连接线 -->
+                <path d="M200,100 C300,150 400,50 500,100" stroke="#E2E8F0" stroke-width="2" fill="none" />
+                <path d="M200,100 C300,50 400,150 500,100" stroke="#E2E8F0" stroke-width="2" fill="none" />
+                <path d="M200,200 C300,250 400,150 500,200" stroke="#E2E8F0" stroke-width="2" fill="none" />
+                <path d="M200,200 C300,150 400,250 500,200" stroke="#E2E8F0" stroke-width="2" fill="none" />
+                <path d="M300,300 C400,350 500,250 600,300" stroke="#E2E8F0" stroke-width="2" fill="none" />
+                
+                <!-- 节点 -->
+                <circle cx="200" cy="100" r="20" fill="#165DFF" class="cursor-pointer" />
+                <text x="200" y="105" text-anchor="middle" fill="white" font-size="12">HTML</text>
+                
+                <circle cx="200" cy="200" r="20" fill="#36D399" class="cursor-pointer" />
+                <text x="200" y="205" text-anchor="middle" fill="white" font-size="12">CSS</text>
+                
+                <circle cx="300" cy="300" r="20" fill="#8B5CF6" class="cursor-pointer" />
+                <text x="300" y="305" text-anchor="middle" fill="white" font-size="12">JavaScript</text>
+                
+                <circle cx="500" cy="100" r="25" fill="#F59E0B" class="cursor-pointer" />
+                <text x="500" y="105" text-anchor="middle" fill="white" font-size="12">React</text>
+                
+                <circle cx="500" cy="200" r="25" fill="#EF4444" class="cursor-pointer" />
+                <text x="500" y="205" text-anchor="middle" fill="white" font-size="12">Vue</text>
+                
+                <circle cx="600" cy="300" r="20" fill="#10B981" class="cursor-pointer" />
+                <text x="600" y="305" text-anchor="middle" fill="white" font-size="12">Node.js</text>
+                
+                <circle cx="400" cy="200" r="30" fill="#165DFF" class="cursor-pointer" />
+                <text x="400" y="205" text-anchor="middle" fill="white" font-size="12">前端基础</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- 移动端侧边栏遮罩 -->
+  <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden"></div>
+
+  <script>
+    // 设置当前日期
+    document.addEventListener('DOMContentLoaded', function() {
+      const now = new Date();
+      const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+      document.getElementById('current-date').textContent = now.toLocaleDateString('zh-CN', options);
+      
+      // 侧边栏切换
+      const sidebarToggle = document.getElementById('sidebar-toggle');
+      const sidebar = document.getElementById('sidebar');
+      const sidebarOverlay = document.getElementById('sidebar-overlay');
+      
+      sidebarToggle.addEventListener('click', function() {
+        sidebar.classList.toggle('hidden');
+        sidebarOverlay.classList.toggle('hidden');
+      });
+      
+      sidebarOverlay.addEventListener('click', function() {
+        sidebar.classList.add('hidden');
+        sidebarOverlay.classList.add('hidden');
+      });
+      
+      // 知识图谱
+      const ctx = document.getElementById('knowledgeChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['前端开发', '后端开发', '数据库', '计算机基础', '数学知识'],
+          datasets: [{
+            data: [24, 18, 12, 31, 9],
+            backgroundColor: [
+              '#3B82F6',
+              '#10B981',
+              '#8B5CF6',
+              '#F59E0B',
+              '#EF4444'
+            ],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                boxWidth: 10,
+                padding: 10,
+                font: {
+                  size: 10
+                }
+              }
+            }
+          },
+          cutout: '70%'
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+    
